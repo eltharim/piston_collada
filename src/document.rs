@@ -337,7 +337,11 @@ impl ColladaDocument {
     ///
     /// Construct an Animation struct for the given <animation> element if possible
     ///
-    fn get_animation(&self, animation_element: &Element) -> Option<Animation> {
+    fn get_animation(&self, animation_container: &Element) -> Option<Animation> {
+        let animation_element = animation_container
+            .get_child("animation", self.get_ns())
+            .expect("Missing animation container");
+
         let channel_element = animation_element
             .get_child("channel", self.get_ns())
             .expect("Missing channel element in animation element");
@@ -457,7 +461,7 @@ impl ColladaDocument {
                 parent_index_stack.pop();
             }
 
-            let joint_name = joint_element.get_attribute("id", None).unwrap().to_string();
+            let joint_name = joint_element.get_attribute("name", None).unwrap().to_string();
 
             let mut joint_names_with_bind_pose = bind_data
                 .joint_names
