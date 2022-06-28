@@ -327,8 +327,13 @@ impl ColladaDocument {
             .get_child("library_animations", self.get_ns())
         {
             Some(library_animations) => {
-                let animations = library_animations.get_children("animation", self.get_ns());
-                Some(animations.filter_map(|a| self.get_animation(a)).collect())
+                let animations = library_animations.get_child("animation", self.get_ns())
+                    .expect("animation wrapper not present")
+                    .get_children("animation", self.get_ns());
+
+                Some(animations.filter_map(|a| {
+                    self.get_animation(a)
+                }).collect())
             }
             None => None,
         }
