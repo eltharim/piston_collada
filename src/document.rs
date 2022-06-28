@@ -342,10 +342,7 @@ impl ColladaDocument {
     ///
     /// Construct an Animation struct for the given <animation> element if possible
     ///
-    fn get_animation(&self, animation_container: &Element) -> Option<Animation> {
-        let animation_element = animation_container
-            .get_child("animation", self.get_ns())
-            .expect("Missing animation container");
+    fn get_animation(&self, animation_element: &Element) -> Option<Animation> {
 
         let channel_element = animation_element
             .get_child("channel", self.get_ns())
