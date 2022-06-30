@@ -329,7 +329,10 @@ impl ColladaDocument {
             Some(library_animations) => {
                 let animations = library_animations.get_child("animation", self.get_ns())
                     .expect("animation wrapper not present")
-                    .get_children("animation", self.get_ns());
+                    .get_children("animation", self.get_ns())
+                    .filter(|an| {
+                        an.name.split("_").last().expect("Could not split animation name by underscore") != "transform"
+                    });
 
                 Some(animations.filter_map(|a| {
                     self.get_animation(a)
