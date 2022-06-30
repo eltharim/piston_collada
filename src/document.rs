@@ -327,16 +327,20 @@ impl ColladaDocument {
             .get_child("library_animations", self.get_ns())
         {
             Some(library_animations) => {
-                let animations = library_animations.get_child("animation", self.get_ns())
+                let animations = library_animations
+                    .get_child("animation", self.get_ns())
                     .expect("animation wrapper not present")
                     .get_children("animation", self.get_ns())
                     .filter(|an| {
-                        an.name.split("_").last().expect("Could not split animation name by underscore") != "transform"
+                        an.get_attribute("id", None)
+                            .expect("No attribute id found on an animation element")
+                            .split("_")
+                            .last()
+                            .expect("Could not split animation name by underscore")
+                            != "transform"
                     });
 
-                Some(animations.filter_map(|a| {
-                    self.get_animation(a)
-                }).collect())
+                Some(animations.filter_map(|a| self.get_animation(a)).collect())
             }
             None => None,
         }
@@ -346,7 +350,6 @@ impl ColladaDocument {
     /// Construct an Animation struct for the given <animation> element if possible
     ///
     fn get_animation(&self, animation_element: &Element) -> Option<Animation> {
-
         let channel_element = animation_element
             .get_child("channel", self.get_ns())
             .expect("Missing channel element in animation element");
@@ -466,7 +469,10 @@ impl ColladaDocument {
                 parent_index_stack.pop();
             }
 
-            let joint_name = joint_element.get_attribute("name", None).unwrap().to_string();
+            let joint_name = joint_element
+                .get_attribute("name", None)
+                .unwrap()
+                .to_string();
 
             let mut joint_names_with_bind_pose = bind_data
                 .joint_names
